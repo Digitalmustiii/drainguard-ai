@@ -1,0 +1,23 @@
+To: ecbap2025@gmail.com
+Subject: Hammed Yusuf Akinteye & Sanusi Mustapha Babansoro - DrainGuard AI - Supporting Materials
+
+Dear Organizing Team,
+
+Please find attached supporting materials for our submission to the AI+Engineering Challenge: Engineering Solutions Competition 2026.
+
+Project Title: DrainGuard AI (DIPS, Drainage Infrastructure Prioritization System)
+Team: Hammed Yusuf Akinteye (Concept Originator and Product Lead) and Sanusi Mustapha Babansoro (Lead Engineer, Full-Stack Development)
+Track: Water, Sanitation, and Resilient Infrastructure
+
+Attached:
+1. DrainGuard_AI_Project_Brief.pdf - full project explainer covering the problem, system architecture, and AI/decision-intelligence approach
+2. [Add: project video, once ready]
+
+Live dashboard: https://drainguard-ai.vercel.app
+GitHub repository: https://github.com/Digitalmustiii/drainguard-ai
+
+Please let us know if any additional information is needed.
+
+Best regards,
+Hammed Yusuf Akinteye and Sanusi Mustapha Babansoro
+DrainGuard AI Team
