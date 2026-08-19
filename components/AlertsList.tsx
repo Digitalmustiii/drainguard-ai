@@ -78,6 +78,7 @@ function drainCode(row: DrainStatus): string {
 
 function clockTime(ts: number): string {
   return new Date(ts).toLocaleTimeString("en-US", {
+    timeZone: "Africa/Lagos",
     hour: "2-digit",
     minute: "2-digit",
     hour12: true,

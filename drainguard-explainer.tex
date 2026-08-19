@@ -1,0 +1,101 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper, margin=2.4cm]{geometry}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+\usepackage{parskip}
+
+\definecolor{dgdark}{HTML}{0A0E17}
+\definecolor{dggreen}{HTML}{059669}
+\definecolor{dgamber}{HTML}{D97706}
+\definecolor{dgred}{HTML}{DC2626}
+\definecolor{dggray}{HTML}{475569}
+
+\titleformat{\section}{\Large\bfseries\color{dgdark}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{dggreen}}{\thesubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{1.4em}{0.6em}
+\titlespacing*{\subsection}{0pt}{1em}{0.4em}
+
+\hypersetup{colorlinks=true, linkcolor=dggreen, urlcolor=dggreen}
+
+\newtcolorbox{laybox}{colback=dggreen!6, colframe=dggreen!60, boxrule=0.6pt, arc=2pt, left=8pt, right=8pt, top=6pt, bottom=6pt}
+\newtcolorbox{techbox}{colback=dggray!6, colframe=dggray!60, boxrule=0.6pt, arc=2pt, left=8pt, right=8pt, top=6pt, bottom=6pt}
+\newtcolorbox{honestbox}{colback=dgamber!8, colframe=dgamber!70, boxrule=0.6pt, arc=2pt, left=8pt, right=8pt, top=6pt, bottom=6pt}
+
+\setlist[itemize]{leftmargin=1.4em, itemsep=2pt, topsep=2pt}
+
+\pagestyle{plain}
+
+\title{\textbf{\color{dgdark} DrainGuard AI} \\[4pt] \large A Flood \& Drainage Risk Dashboard for Lagos \\[2pt] \normalsize\color{dggray} WFEO ECBAP AI + Engineering Challenge 2026 --- Water, Sanitation \& Resilient Infrastructure}
+\author{}
+\date{\small \today}
+
+\begin{document}
+\maketitle
+\vspace{-1.5em}
+
+\section*{What This Document Is}
+This is a short, plain explanation of DrainGuard AI: what it does, how it works under the hood, and what is real data versus what is simulated. It's written so it can be handed to anyone --- a judge, a teammate, or a curious friend --- and understood in a few minutes.
+
+\section{The Problem, In One Paragraph}
+\begin{laybox}
+Lagos floods often and badly. A big reason is that drains get blocked or overwhelmed, and nobody finds out until water is already in the street. There's no simple, live picture of \emph{which drains, in which neighborhoods, are most at risk right now}. DrainGuard AI is an attempt to build that picture cheaply, using real weather data and honest engineering, without needing expensive hardware nobody has yet installed.
+\end{laybox}
+
+\section{What DrainGuard AI Does}
+DrainGuard AI is a web dashboard that shows, for a set of real flood-prone locations across Lagos:
+\begin{itemize}
+  \item An overall flood risk level for the city (Low / Moderate / High), shown as a gauge.
+  \item A live map with a pin at each monitored drain, color-coded by risk.
+  \item A table of every drain's water level, blockage percentage, and risk score.
+  \item Real rainfall, temperature, and weather conditions for Lagos, refreshed automatically.
+  \item A rainfall trend chart and a recent-alerts feed.
+\end{itemize}
+
+\section{How It Works (Technical View)}
+\begin{techbox}
+\textbf{Stack:} Next.js (frontend, React) + Convex (backend: database, scheduled jobs, serverless functions). No authentication layer --- the dashboard is public/read-only, so nothing is gated behind login.
+
+\textbf{Data flow:}
+\begin{enumerate}[leftmargin=1.6em]
+  \item Every 7 minutes, a Convex cron job calls the \href{https://open-meteo.com}{Open-Meteo} weather API (free, no key required) and pulls real 24-hour rainfall, current temperature, weather condition, and soil moisture for Lagos.
+  \item That same cron cycle updates a simulated reading (water level, blockage \%) for each of the 10 monitored drains. The simulation is a random walk nudged by the real rainfall figure --- heavier real rain pushes simulated water levels up, exactly like it would in reality.
+  \item A scoring function combines water level, blockage, and rainfall into a single 0--100 \textbf{risk score} per drain, and an overall city-wide score.
+  \item The frontend subscribes to this data live (Convex pushes updates instantly to the browser --- no manual refresh needed).
+\end{enumerate}
+
+\textbf{Risk score formula} (transparent, not a black box):
+\[
+\text{Score} = \underbrace{40 \times \tfrac{\text{water level}}{150\text{cm}}}_{\text{water}} \;+\; \underbrace{30 \times \tfrac{\text{blockage \%}}{100}}_{\text{blockage}} \;+\; \underbrace{30 \times \tfrac{\text{rainfall (24h)}}{50\text{mm}}}_{\text{rainfall}}
+\]
+Each term is capped so it can't exceed its share. Score $\geq 70$ = High, $\geq 40$ = Moderate, else Low. The 150cm and 50mm reference values are reasonable placeholders, not site-surveyed engineering constants --- flagged honestly in the code for future calibration.
+\end{techbox}
+
+\section{What's Real, and What's Simulated}
+\begin{honestbox}
+\textbf{Being honest about this is the whole point of an MVP.} Nobody has physical flood sensors installed in Lagos drains at this scale --- not us, not (currently) anyone outside a small pilot. So:
+
+\begin{itemize}
+  \item \textbf{Real:} the 10 drain locations (actual named, flood-prone Lagos neighborhoods), all rainfall/temperature/weather/soil-moisture data (live from Open-Meteo), and the risk-scoring math applied to that data.
+  \item \textbf{Simulated:} water level and blockage percentage per drain, because no live sensor exists yet. The simulation is not random noise --- it responds to real rainfall, so it behaves plausibly, but it is not a live sensor reading and the dashboard doesn't pretend otherwise.
+  \item \textbf{Built but not yet active:} a community-reporting feature, where residents could report a flooded drain and have it feed into the real data (a zero-cost path to genuine sensor-free ground truth). The backend for this exists; the submission form in the UI is still being built.
+\end{itemize}
+
+Nothing on the dashboard is hardcoded or faked to look more real than it is. Where a genuine data source wasn't available (e.g. tide level), the feature was removed rather than invented.
+\end{honestbox}
+
+\section{Why This Approach, Not Fake Sensors}
+\begin{laybox}
+It would have been easy to just make up sensor numbers and call it "AI-powered." We chose not to, because a dashboard that quietly fabricates data is worse than one that's honest about being a prototype. Every number that \emph{can} be real (weather, location, the math) \emph{is} real. Every number that can't yet be real (physical sensor readings) is clearly built on a transparent simulation, not disguised as one.
+\end{laybox}
+
+\section{In One Sentence}
+DrainGuard AI turns live Lagos weather data into a real-time, explainable flood-risk picture for ten real drainage hotspots --- honestly built as a working prototype, not a finished sensor network.
+
+\vspace{1.2em}
+\noindent\textit{Prepared for the WFEO ECBAP AI + Engineering Challenge 2026 submission.}
+
+\end{document}

@@ -37,8 +37,9 @@ export const generateReadings = internalAction({
 
       const waterLevelCm = clamp(
         baseWaterLevel +
-          (Math.random() - 0.35) * 15 + // random walk, slight upward bias
-          rainInfluence * 20, // rain pushes levels up
+          (Math.random() - 0.5) * 12 + // neutral random walk, no built-in drift
+          rainInfluence * 18 - // rain pushes levels up
+          (1 - rainInfluence) * 6, // dry conditions let water drain away
         0,
         200
       );

@@ -62,7 +62,8 @@ export function RainfallTrendChart({ history }: { history: Snapshot[] }) {
         .sort((a, b) => a.fetchedAt - b.fetchedAt)
         .map((snap) => ({
           ts: snap.fetchedAt,
-          time: new Date(snap.fetchedAt).toLocaleTimeString([], {
+          time: new Date(snap.fetchedAt).toLocaleTimeString("en-GB", {
+            timeZone: "Africa/Lagos",
             hour: "2-digit",
             minute: "2-digit",
             hour12: false,
