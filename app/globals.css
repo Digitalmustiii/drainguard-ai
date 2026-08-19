@@ -41,9 +41,12 @@ body {
   display: none !important;
 }
 
-/* Slightly desaturate + darken tiles so markers pop */
+/* CARTO's dark basemap is already near-black; darkening it further
+   (the old brightness(0.82) contrast(1.08) combo) crushed the street/place
+   labels baked into the tiles down to unreadable. Brighten slightly instead
+   so labels stay legible, markers still pop via their own halo/shadow. */
 .dg-tiles {
-  filter: brightness(0.82) saturate(0.85) contrast(1.08);
+  filter: brightness(1.15) saturate(0.9);
 }
 
 /* ---------------- Custom markers ---------------- */
