@@ -95,8 +95,9 @@ export function RiskGauge({
   const r = 70;
   const strokeWidth = 16;
 
-  // Needle angle: 0% risk = 0° (right/green), 100% risk = 180° (left/red)
-  const needleAngle = 180 - (score / 100) * 180;
+  // Needle angle: 0% risk = 0° (left/green), 100% risk = 180° (right/red).
+  // Must match the segment layout below (red at 180-120, green at 60-0).
+  const needleAngle = (score / 100) * 180;
 
   // Segment definitions: red (high) left, amber mid, green (low) right
   const segments = useMemo(
@@ -180,7 +181,7 @@ export function RiskGauge({
 
               {/* Tick marks */}
               {[0, 30, 50, 70, 100].map((tick) => {
-                const angle = 180 - (tick / 100) * 180;
+                const angle = (tick / 100) * 180;
                 const inner = polarToCartesian(cx, cy, r - strokeWidth / 2 - 4, angle);
                 const outer = polarToCartesian(cx, cy, r + strokeWidth / 2 + 4, angle);
                 return (
